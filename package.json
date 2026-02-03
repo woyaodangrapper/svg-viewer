@@ -1,10 +1,10 @@
 {
-  "name": "svg-gallery",
-  "displayName": "SVG Gallery",
-  "description": "View SVG images in gallery",
-  "version": "3.0.0",
-  "publisher": "developer2006",
-  "icon": "images/logo.png",
+  "name": "svg-viewer",
+  "displayName": "SVG Viewer",
+  "description": "View SVG, images in a waterfall gallery",
+  "version": "1.0.0",
+  "icon": "logo.png",
+  "publisher": "dev",
   "engines": {
     "vscode": "^1.82.0"
   },
@@ -14,7 +14,9 @@
   "keywords": [
     "icon",
     "svg",
-    "viewer"
+    "viewer",
+    "image",
+    "gallery"
   ],
   "galleryBanner": {
     "color": "#37699A",
@@ -27,73 +29,69 @@
   "contributes": {
     "commands": [
       {
-        "command": "SVGGallery.open",
-        "title": "Open in SVG Gallery",
-        "category": "File"
+        "command": "SVGViewer.open",
+        "title": "%command.open.title%",
+        "category": "%command.open.category%"
       }
     ],
     "menus": {
       "commandPalette": [
         {
-          "command": "SVGGallery.open",
-          "when": "explorerResourceIsFolder || resourceFilename =~ /.+\\.svg$/i"
+          "command": "SVGViewer.open",
+          "when": "explorerResourceIsFolder || resourceFilename =~ /.+\\.(svg|png|jpg|jpeg|gif|webp|ico|bmp|json)$/i"
         }
       ],
       "explorer/context": [
         {
-          "command": "SVGGallery.open",
-          "when": "explorerResourceIsFolder || resourceFilename =~ /.+\\.svg$/i",
-          "group": "SVGGallery@1"
+          "command": "SVGViewer.open",
+          "when": "explorerResourceIsFolder || resourceFilename =~ /.+\\.(svg|png|jpg|jpeg|gif|webp|ico|bmp|json)$/i",
+          "group": "SVGViewer@1"
         }
       ],
       "editor/context": [
         {
-          "command": "SVGGallery.open",
-          "when": "explorerResourceIsFolder || resourceFilename =~ /.+\\.svg$/i",
-          "group": "SVGGallery@1"
+          "command": "SVGViewer.open",
+          "when": "explorerResourceIsFolder || resourceFilename =~ /.+\\.(svg|png|jpg|jpeg|gif|webp|ico|bmp|json)$/i",
+          "group": "SVGViewer@1"
         }
       ]
     }
   },
+  "packageManager": "pnpm@9.15.4",
   "scripts": {
-    "vscode:prepublish": "webpack --mode production",
-    "watch": "webpack --mode development --watch --info-verbosity verbose",
-    "rollup": "rollup -c"
+    "dev": "vite build --watch",
+    "build": "vite build",
+    "build:webview": "vite build --config vite.webview.config.ts",
+    "build:all": "pnpm run build && pnpm run build:webview",
+    "package": "pnpm run build:all && vsce package --no-dependencies --allow-star-activation",
+    "vscode:prepublish": "pnpm run build:all"
   },
   "devDependencies": {
-    "@rollup/plugin-commonjs": "28.0.3",
-    "@rollup/plugin-node-resolve": "15.2.3",
-    "@types/node": "20.14.8",
+    "@types/node": "^22.10.5",
+    "@types/react": "^19.0.6",
+    "@types/react-dom": "^19.0.2",
     "@types/vscode": "^1.82.0",
-    "@typescript-eslint/eslint-plugin": "^2.26.0",
-    "@typescript-eslint/parser": "^2.26.0",
-    "clean-webpack-plugin": "^3.0.0",
-    "css-loader": "^3.4.2",
-    "eslint": "^6.8.0",
-    "raw-loader": "^4.0.0",
-    "rollup": "^4.41.0",
-    "style-loader": "^1.1.0",
-    "ts-loader": "8.4.0",
-    "typescript": "4.8.4",
-    "webpack": "4.47.0",
-    "webpack-cli": "^3.3.0"
+    "@vitejs/plugin-react": "^4.3.4",
+    "tailwindcss": "^4.0.0",
+    "@tailwindcss/vite": "^4.0.0",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.7",
+    "@vscode/vsce": "^3.2.1"
   },
   "dependencies": {
-    "ejs": "3.0.2",
-    "fast-glob": "3.3.3",
-    "fast-xml-parser": "3.16.0",
-    "lodash": "4.17.21",
-    "nanoid": "3.3.8",
-    "picomatch": "^4.0.2"
+    "@heroui/react": "3.0.0-beta.5",
+    "@heroui/styles": "3.0.0-beta.5",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   },
-  "author": "Yongjian Huang",
+  "author": "woyaodangrapper",
   "license": "MIT",
-  "homepage": "https://github.com/codelab2006/svg-gallery#readme",
+  "homepage": "https://github.com/woyaodangrapper/svg-viewer",
   "repository": {
     "type": "git",
-    "url": "https://github.com/codelab2006/svg-gallery.git"
+    "url": "https://github.com/woyaodangrapper/svg-viewer.git"
   },
   "bugs": {
-    "url": "https://github.com/codelab2006/svg-gallery/issues"
+    "url": "https://github.com/woyaodangrapper/svg-viewer/issues"
   }
 }

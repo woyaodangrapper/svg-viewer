@@ -1,256 +1,180 @@
-import * as vscode from "vscode";
-import { parse, extname, dirname } from "path";
-import { Dirent, statSync, Stats } from "fs";
-import * as fg from "fast-glob";
+import * as vscode from 'vscode';
+import * as path from 'path';
+import * as fs from 'fs';
 
-import Gallery from "./Gallery";
-import { EXT_SET, VIEW_TYPE, TEXT_MULTIPLE_FILES, SVG_EXT } from "./constant";
+// 支持的图片格式
+const IMAGE_EXTENSIONS = ['.svg', '.png', '.jpg', '.jpeg', '.gif', '.webp', '.ico', '.bmp'];
 
-import GALLERY_TPL from "./templates/gallery.ejs";
+interface ImageFile {
+  name: string;
+  path: string;
+  uri: string;
+  type: 'svg' | 'image';
+  extension: string;
+}
 
-import { nanoid } from "nanoid";
-import { Pattern } from "fast-glob";
+export function activate(context: vscode.ExtensionContext) {
+  const disposable = vscode.commands.registerCommand('SVGViewer.open', async (uri: vscode.Uri) => {
+    let targetPath: string;
 
-export const SHOW_SVG_ONLY = "showSVGOnly";
-export const CUSTOM_BG_COLOR = "customBgColor";
-export const FILTER = "filter";
-
-abstract class AbstractGallery {
-  constructor(
-    protected context: vscode.ExtensionContext,
-    protected webviewPanels: Map<string, vscode.WebviewPanel>,
-    private key: string
-  ) {
-    if (context.workspaceState.get(SHOW_SVG_ONLY) === undefined) {
-      context.workspaceState.update(SHOW_SVG_ONLY, true);
-    }
-  }
-
-  build(): void {
-    let webViewPanel: vscode.WebviewPanel | undefined = this.webviewPanels.get(
-      this.key
-    );
-
-    if (webViewPanel) {
-      webViewPanel.reveal();
+    if (uri) {
+      targetPath = uri.fsPath;
     } else {
-      webViewPanel = this.createWebviewPanel(
-        `${this.generateWebviewPanelTitle()} - SVG Gallery`
-      );
-      this.context.subscriptions.push(
-        webViewPanel.onDidChangeViewState(
-          (e: vscode.WebviewPanelOnDidChangeViewStateEvent) => {
-            if (e.webviewPanel.visible) {
-              this.refreshWebview(e.webviewPanel);
-            }
-          }
-        )
-      );
-      this.context.subscriptions.push(
-        webViewPanel.onDidDispose(() => this.webviewPanels.delete(this.key))
-      );
-      this.context.subscriptions.push(
-        webViewPanel.webview.onDidReceiveMessage(
-          ({ command, args }: { command: string; args: any }) => {
-            switch (command) {
-              case "OPEN_FILE":
-                const { path: filePath }: { path: string } = args;
-                if (filePath) {
-                  if (extname(filePath).toLowerCase() === SVG_EXT) {
-                    vscode.window
-                      .showTextDocument(vscode.Uri.file(filePath))
-                      .then(
-                        () => {},
-                        () => {
-                          vscode.window.showErrorMessage(
-                            "Oops! Unable to open the file."
-                          );
-                          if (webViewPanel) {
-                            this.refreshWebview(webViewPanel);
-                          }
-                        }
-                      );
-                  } else {
-                    vscode.commands.executeCommand(
-                      "vscode.open",
-                      vscode.Uri.file(filePath)
-                    );
-                  }
-                }
-                return;
-              case "REFRESH":
-                if (webViewPanel) {
-                  this.refreshWebview(webViewPanel);
-                  vscode.window.setStatusBarMessage("Refreshing...", 1000);
-                }
-                return;
-              case "SAVE_FILTER_CONFIG":
-                const { value: filter }: { value: string } = args;
-                this.context.workspaceState.update(FILTER, filter);
-                return;
-              case "SAVE_CUSTOM_BG_COLOR_CONFIG":
-                const { value: bgColor }: { value: boolean } = args;
-                this.context.workspaceState.update(CUSTOM_BG_COLOR, bgColor);
-                return;
-              case "SAVE_SHOW_SVG_ONLY_CONFIG":
-                if (webViewPanel) {
-                  const { value }: { value: boolean } = args;
-                  this.context.workspaceState.update(SHOW_SVG_ONLY, value);
-                  this.refreshWebview(webViewPanel);
-                }
-                return;
-            }
-          }
-        )
-      );
-      this.webviewPanels.set(this.key, webViewPanel);
+      const activeEditor = vscode.window.activeTextEditor;
+      if (activeEditor) {
+        targetPath = activeEditor.document.uri.fsPath;
+      } else {
+        vscode.window.showErrorMessage('No file or folder selected');
+        return;
+      }
     }
-    this.refreshWebview(webViewPanel);
-  }
 
-  private createWebviewPanel(title: string): vscode.WebviewPanel {
-    return vscode.window.createWebviewPanel(
-      VIEW_TYPE,
-      title,
+    const stat = fs.statSync(targetPath);
+    let images: ImageFile[] = [];
+
+    if (stat.isDirectory()) {
+      images = await scanDirectory(targetPath, context);
+    } else {
+      const ext = path.extname(targetPath).toLowerCase();
+      const imageFile = createImageFile(targetPath, context);
+      if (imageFile) {
+        images = [imageFile];
+      }
+    }
+
+    if (images.length === 0) {
+      vscode.window.showInformationMessage('No images found in the selected location');
+      return;
+    }
+
+    const panel = vscode.window.createWebviewPanel(
+      'svgViewer',
+      `Image Viewer - ${path.basename(targetPath)}`,
       vscode.ViewColumn.One,
       {
         enableScripts: true,
-        enableFindWidget: false,
+        retainContextWhenHidden: true,
         localResourceRoots: [
-          ...(vscode.workspace.workspaceFolders?.map((f) => f.uri) || []),
-          vscode.Uri.joinPath(this.context.extensionUri, "media"),
-        ],
+          vscode.Uri.file(path.join(context.extensionPath, 'dist')),
+          vscode.Uri.file(path.dirname(targetPath))
+        ]
       }
     );
-  }
 
-  private refreshWebview(webviewPanel: vscode.WebviewPanel): void {
-    void (async () => {
-      const data = await this.generateGalleryData();
-      const webview = webviewPanel.webview;
-      const gallery: Gallery = new Gallery(
-        this.context,
-        GALLERY_TPL,
-        webview,
-        data
-      );
-      webview.html = gallery.generateHtml();
-    })();
-  }
-
-  protected abstract generateWebviewPanelTitle(): string;
-  protected abstract generateGalleryData(): Promise<Map<string, string[]>>;
-}
-
-class FileGallery extends AbstractGallery {
-  constructor(
-    context: vscode.ExtensionContext,
-    webviewPanels: Map<string, vscode.WebviewPanel>,
-    private v: any[]
-  ) {
-    super(context, webviewPanels, v.length === 1 ? v[0].fsPath : nanoid());
-  }
-
-  protected generateWebviewPanelTitle(): string {
-    return this.v.length === 1
-      ? parse(this.v[0].fsPath).base
-      : TEXT_MULTIPLE_FILES;
-  }
-
-  protected async generateGalleryData(): Promise<Map<string, string[]>> {
-    const map: Map<string, string[]> = new Map();
-    this.v.forEach((e: any) => {
-      const dir: string = parse(e.fsPath).dir;
-      if (!map.has(dir)) {
-        map.set(dir, []);
-      }
-      map.get(dir)?.push(e.fsPath);
-    });
-    return Promise.resolve(map);
-  }
-}
-
-class FolderGallery extends AbstractGallery {
-  constructor(
-    context: vscode.ExtensionContext,
-    webviewPanels: Map<string, vscode.WebviewPanel>,
-    private v: any
-  ) {
-    super(context, webviewPanels, v.fsPath);
-  }
-
-  protected generateWebviewPanelTitle(): string {
-    return parse(this.v.fsPath).name;
-  }
-
-  protected async generateGalleryData(): Promise<Map<string, string[]>> {
-    return await this.findFilesByExtAsync(this.v.fsPath, EXT_SET);
-  }
-
-  private async findFilesByExtAsync(
-    path: string,
-    extSet: Set<string>
-  ): Promise<Map<string, string[]>> {
-    const result = new Map<string, string[]>();
-
-    const source: Pattern = this.context.workspaceState.get(SHOW_SVG_ONLY)
-      ? `**/*${SVG_EXT}`
-      : `**/*.{${[...extSet.values()]
-          .map((ext) => ext.replace(".", ""))
-          .join(",")}}`;
-
-    let files = await fg([source, "!**/node_modules/**"], {
-      cwd: path,
-      absolute: true,
-      onlyFiles: true,
-    });
-
-    for (const file of files) {
-      const dir = dirname(file);
-      if (!result.has(dir)) {
-        result.set(dir, []);
-      }
-      result.get(dir)?.push(file);
-    }
-
-    return new Map(
-      [...result.entries()].sort((a, b) => a[0].localeCompare(b[0]))
-    );
-  }
-}
-
-// this method is called when your extension is activated
-export function activate(context: vscode.ExtensionContext) {
-  console.log('Congratulations, your extension "SVG Gallery" is now active!');
-
-  const webviewPanels: Map<string, vscode.WebviewPanel> = new Map();
-  const regexp: RegExp = /.+\.(svg|png|jpg|jpeg|webp|gif|bmp|ico)$/i;
-
-  context.subscriptions.push(
-    vscode.commands.registerCommand(
-      "SVGGallery.open",
-      (item: any, items: any[]) => {
-        const selectedFiles: any[] = [];
-        const selectedFolders: any[] = [];
-        (items && items.length ? items : [item]).forEach((item: any) => {
-          const stats: Stats = statSync(item.fsPath);
-          if (stats.isFile() && regexp.test(item.fsPath)) {
-            selectedFiles.push(item);
-          }
-          if (stats.isDirectory()) {
-            selectedFolders.push(item);
-          }
-        });
-        if (selectedFiles.length) {
-          new FileGallery(context, webviewPanels, selectedFiles).build();
+    panel.webview.onDidReceiveMessage(
+      message => {
+        console.log('Extension received message:', message);
+        if (message.command === 'open-svg') {
+          const svgUri = vscode.Uri.file(message.path);
+          openSvgInEditor(svgUri);
         }
-        selectedFolders.forEach((v: any) =>
-          new FolderGallery(context, webviewPanels, v).build()
-        );
-      }
-    )
-  );
+        if (message.command === 'open-web') {
+          vscode.env.openExternal(vscode.Uri.parse(message.url));
+        }
+      },
+      undefined,
+      context.subscriptions
+    );
+
+    panel.webview.html = getWebviewContent(panel.webview, context, images);
+  });
+
+  context.subscriptions.push(disposable);
 }
 
-// this method is called when your extension is deactivated
-export function deactivate() {}
+function openSvgInEditor(svgUri: vscode.Uri) {
+  vscode.workspace.openTextDocument(svgUri).then(doc => {
+    vscode.window.showTextDocument(doc, {
+      preview: false,  // 如果为 true，重复打开同一个文件会复用 tab
+      viewColumn: vscode.ViewColumn.One // 打开在第一个编辑器列
+    });
+  }, err => {
+    vscode.window.showErrorMessage(`无法打开 SVG: ${err}`);
+  });
+}
+
+async function scanDirectory(dirPath: string, context: vscode.ExtensionContext): Promise<ImageFile[]> {
+  const images: ImageFile[] = [];
+
+  async function scan(dir: string) {
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry.name);
+
+      if (entry.isDirectory()) {
+        await scan(fullPath);
+      } else if (entry.isFile()) {
+        const imageFile = createImageFile(fullPath, context);
+        if (imageFile) {
+          images.push(imageFile);
+        }
+      }
+    }
+  }
+
+  await scan(dirPath);
+  return images;
+}
+
+function createImageFile(filePath: string, context: vscode.ExtensionContext): ImageFile | null {
+  const ext = path.extname(filePath).toLowerCase();
+
+  if (IMAGE_EXTENSIONS.includes(ext)) {
+    return {
+      name: path.basename(filePath),
+      path: filePath,
+      uri: filePath,
+      type: ext === '.svg' ? 'svg' : 'image',
+      extension: ext.slice(1)
+    };
+  }
+
+  return null;
+}
+
+function getWebviewContent(webview: vscode.Webview, context: vscode.ExtensionContext, images: ImageFile[]): string {
+  const scriptUri = webview.asWebviewUri(
+    vscode.Uri.file(path.join(context.extensionPath, 'dist', 'webview', 'index.js'))
+  );
+  const styleUri = webview.asWebviewUri(
+    vscode.Uri.file(path.join(context.extensionPath, 'dist', 'webview', 'index.css'))
+  );
+
+  // 转换图片路径为 webview URI
+  const imagesWithUri = images.map(img => ({
+    ...img,
+    uri: webview.asWebviewUri(vscode.Uri.file(img.path)).toString()
+  }));
+
+  const nonce = getNonce();
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}'; img-src ${webview.cspSource} data: https:; font-src ${webview.cspSource};">
+  <link rel="stylesheet" href="${styleUri}">
+  <title>Image Viewer</title>
+</head>
+<body>
+  <div id="root"></div>
+  <script nonce="${nonce}">
+    window.__IMAGES__ = ${JSON.stringify(imagesWithUri)};
+  </script>
+  <script nonce="${nonce}" src="${scriptUri}"></script>
+</body>
+</html>`;
+}
+
+function getNonce(): string {
+  let text = '';
+  const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  for (let i = 0; i < 32; i++) {
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+  }
+  return text;
+}
+
+export function deactivate() { }

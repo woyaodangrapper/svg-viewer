@@ -1,15 +1,14 @@
-<svg width="128" height="128"
-  xmlns="http://www.w3.org/2000/svg">
-  <g>
-    <rect y="0" x="0" stroke="#ffffff" id="svg_0" height="128" width="128" fill-opacity="null" stroke-width="6" fill="#000"/>
-    <rect stroke-width="4" id="svg_1" height="35" width="35" y="6" x="6" fill-opacity="null" stroke-opacity="null" stroke="#ffffff" fill="#f85520"/>
-    <rect stroke-width="4" id="svg_2" height="35" width="36" y="6" x="46" fill-opacity="null" stroke-opacity="null" stroke="#ffffff" fill="#f85520"/>
-    <rect stroke-width="4" id="svg_3" height="35" width="35" y="6" x="87" fill-opacity="null" stroke-opacity="null" stroke="#ffffff" fill="#80b604"/>
-    <rect stroke-width="4" id="svg_4" height="36" width="35" y="46" x="6" fill-opacity="null" stroke-opacity="null" stroke="#ffffff" fill="#00a4ee"/>
-    <rect stroke-width="4" id="svg_5" height="36" width="36" y="46" x="46" fill-opacity="null" stroke-opacity="null" stroke="#ffffff" fill="#ffffff"/>
-    <rect stroke-width="4" id="svg_6" height="36" width="35" y="46" x="87" fill-opacity="null" stroke-opacity="null" stroke="#ffffff" fill="#80b604"/>
-    <rect stroke-width="4" id="svg_7" height="35" width="35" y="87" x="6" fill-opacity="null" stroke-opacity="null" stroke="#ffffff" fill="#00a4ee"/>
-    <rect stroke-width="4" id="svg_8" height="35" width="36" y="87" x="46" fill-opacity="null" stroke-opacity="null" stroke="#ffffff" fill="#febc00"/>
-    <rect stroke-width="4" id="svg_9" height="35" width="35" y="87" x="87" fill-opacity="null" stroke-opacity="null" stroke="#ffffff" fill="#febc00"/>
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+
+  <rect x="18" y="22" width="56" height="56" rx="4" fill="none" stroke="#37699A" stroke-width="3" opacity="0.25"/>
+
+  <rect x="36" y="36" width="56" height="56" rx="4" fill="none" stroke="#37699A" stroke-width="3" opacity="0.5"/>
+
+  <rect x="54" y="50" width="56" height="56" rx="4" fill="#37699A" stroke="none"/>
+
+  <g transform="translate(89, 60) scale(0.5)">
+    <path fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="10" d="M -100 -10 C -137 29 -174 68 -138 58 C -102 48 6 -10 42 -22 C 78 -34 42 0 6 35"/>
+    <circle cx="-100" cy="-10" r="6" fill="#fff"/>
+    <circle cx="6" cy="35" r="6" fill="#fff"/>
   </g>
 </svg>
