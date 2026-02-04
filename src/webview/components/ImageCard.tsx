@@ -55,41 +55,46 @@ const ImageCard: React.FC<ImageCardProps> = ({ image }) => {
           >
             {/* 缩略图 */}
             <div className="w-6 h-6 shrink-0 rounded-full overflow-hidden flex items-center justify-center">
-              {hasError ? (
-                <span className="text-[8px]  text-red-400">ERR</span>
-              ) : (
-                <Dropdown>
-                  <Dropdown.Trigger>
+              <Dropdown>
+                <Dropdown.Trigger>
+                  {hasError ? (
+                    <span className="text-[8px]  text-red-400 h-[23px] w-[23px] flex items-center justify-center">ERR</span>
+                  ) : (
                     <Avatar className="bg-surface">
                       <Avatar.Image className='p-2.5'
                         alt={image.name}
                         src={image.uri}
                       />
                     </Avatar>
-                  </Dropdown.Trigger>
-                  <Dropdown.Popover>
-                    <div className="px-3 pt-3 pb-1">
-                      <div className="flex items-center gap-2">
+                  )}
+                </Dropdown.Trigger>
+                <Dropdown.Popover>
+                  <div className="px-3 pt-3 pb-1">
+                    <div className="flex items-center gap-2">
+                      {hasError ? (
+                        <span className="text-[8px]  text-red-400">ERR</span>
+                      ) : (
                         <Avatar size="sm">
                           <Avatar.Image className='p-1'
                             alt={image.name}
                             src={image.uri}
                           />
                         </Avatar>
-                        <div className="flex flex-col gap-0 max-w-50 pb-2">
-                          <p className="text-sm leading-5 font-medium truncate">{image.name}</p>
-                          <p className="text-xs leading-none text-muted">{image.extension}</p>
-                        </div>
+                      )}
+                      <div className="flex flex-col gap-0 max-w-50 pb-2">
+                        <p className="text-sm leading-5 font-medium truncate">{image.name}</p>
+                        <p className="text-xs leading-none text-muted">{image.extension}</p>
                       </div>
                     </div>
-                    <Dropdown.Menu>
-                      <Dropdown.Item id="edit" textValue="Edit" onClick={openSvgInEditor(image.path)}>
-                        <Label>编辑</Label>
-                      </Dropdown.Item>
-                      <Dropdown.Item id="locate" textValue="Locate" onClick={goToSvgInLocate(image.path)}>
-                        <Label>定位</Label>
-                      </Dropdown.Item>
-                      {/* <Dropdown.Item id="profile" textValue="Profile">
+                  </div>
+                  <Dropdown.Menu>
+                    <Dropdown.Item id="edit" textValue="Edit" onClick={openSvgInEditor(image.path)}>
+                      <Label>编辑</Label>
+                    </Dropdown.Item>
+                    <Dropdown.Item id="locate" textValue="Locate" onClick={goToSvgInLocate(image.path)}>
+                      <Label>定位</Label>
+                    </Dropdown.Item>
+                    {/* <Dropdown.Item id="profile" textValue="Profile">
                         <Label>Profile</Label>
                       </Dropdown.Item>
                       <Dropdown.Item id="settings" textValue="Settings">
@@ -103,10 +108,10 @@ const ImageCard: React.FC<ImageCardProps> = ({ image }) => {
                         </div>
                       </Dropdown.Item> */}
 
-                    </Dropdown.Menu>
-                  </Dropdown.Popover>
-                </Dropdown>
-              )}
+                  </Dropdown.Menu>
+                </Dropdown.Popover>
+              </Dropdown>
+
             </div>
 
             {/* 类型标签 */}
