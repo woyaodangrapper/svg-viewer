@@ -1,0 +1,14 @@
+.git/
+.gitignore
+.vscode/
+node_modules/
+src/**
+!src/images/
+*.ts
+!*.d.ts
+tsconfig.json
+vite.config.ts
+vite.webview.config.ts
+pnpm-lock.yaml
+*.vsix
+images/

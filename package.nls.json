@@ -1,4 +1,6 @@
 {
   "command.open.title": "Open in SVG Viewer",
+  "command.openInPanel.title": "Open in SVG Viewer Panel",
+  "command.refresh.title": "Refresh",
   "command.open.category": "File"
 }

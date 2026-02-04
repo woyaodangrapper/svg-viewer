@@ -56,8 +56,6 @@ const App: React.FC<AppProps> = ({ images }) => {
   return (
     <div className="h-full max-w-full bg-(--vscode-editor-background) text-(--vscode-editor-foreground) p-4">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold mb-4">图片预览器</h1>
-
         <SearchField name="search" className="max-w-md mb-4 px-0 py-2 ">
           <SearchField.Group>
             <SearchField.SearchIcon>

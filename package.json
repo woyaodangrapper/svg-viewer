@@ -27,25 +27,119 @@
   ],
   "main": "./dist/extension.js",
   "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "svgViewerExplorer",
+          "title": "SVG Viewer",
+          "icon": "logo.svg"
+        }
+      ],
+      "panel": [
+        {
+          "id": "svgViewerPanel",
+          "title": "SVG Viewer",
+          "icon": "logo.svg"
+        }
+      ]
+    },
+    "views": {
+      "svgViewerExplorer": [
+        {
+          "id": "svgViewer.imageTree",
+          "name": "Images",
+          "contextualTitle": "SVG Viewer"
+        }
+      ],
+      "svgViewerPanel": [
+        {
+          "type": "webview",
+          "id": "svgViewer.panelView",
+          "name": "SVG Viewer",
+          "contextualTitle": "SVG Viewer"
+        }
+      ]
+    },
     "commands": [
       {
         "command": "SVGViewer.open",
         "title": "%command.open.title%",
-        "category": "%command.open.category%"
+        "category": "%command.open.category%",
+        "icon": "src/images/window.svg"
+      },
+      {
+        "command": "SVGViewer.openInPanel",
+        "title": "%command.openInPanel.title%",
+        "category": "%command.open.category%",
+        "icon": "src/images/panel.svg"
+      },
+      {
+        "command": "SVGViewer.refresh",
+        "title": "%command.refresh.title%",
+        "category": "%command.open.category%",
+        "icon": "src/images/refresh.svg"
+      },
+      {
+        "command": "SVGViewer.openFromTree",
+        "title": "%command.open.title%",
+        "category": "%command.open.category%",
+        "icon": "src/images/window.svg"
+      },
+      {
+        "command": "SVGViewer.openInPanelFromTree",
+        "title": "%command.openInPanel.title%",
+        "category": "%command.open.category%",
+        "icon": "src/images/panel.svg"
       }
     ],
     "menus": {
+      "view/title": [
+        {
+          "command": "SVGViewer.refresh",
+          "when": "view == svgViewer.imageTree",
+          "group": "navigation@1"
+        },
+        {
+          "command": "SVGViewer.openInPanel",
+          "when": "view == svgViewer.imageTree",
+          "group": "navigation@2"
+        },
+        {
+          "command": "SVGViewer.open",
+          "when": "view == svgViewer.imageTree",
+          "group": "navigation@3"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "SVGViewer.openInPanelFromTree",
+          "when": "view == svgViewer.imageTree && viewItem == imageFile",
+          "group": "inline@1"
+        },
+        {
+          "command": "SVGViewer.openFromTree",
+          "when": "view == svgViewer.imageTree && viewItem == imageFile",
+          "group": "inline@2"
+        },
+        {
+          "command": "SVGViewer.openInPanelFromTree",
+          "when": "view == svgViewer.imageTree && viewItem == folder",
+          "group": "inline@1"
+        },
+        {
+          "command": "SVGViewer.openFromTree",
+          "when": "view == svgViewer.imageTree && viewItem == folder",
+          "group": "inline@2"
+        }
+      ],
       "commandPalette": [
         {
           "command": "SVGViewer.open",
           "when": "explorerResourceIsFolder || resourceFilename =~ /.+\\.(svg|png|jpg|jpeg|gif|webp|ico|bmp|json)$/i"
-        }
-      ],
-      "explorer/context": [
+        },
         {
-          "command": "SVGViewer.open",
-          "when": "explorerResourceIsFolder || resourceFilename =~ /.+\\.(svg|png|jpg|jpeg|gif|webp|ico|bmp|json)$/i",
-          "group": "SVGViewer@1"
+          "command": "SVGViewer.openInPanel",
+          "when": "explorerResourceIsFolder || resourceFilename =~ /.+\\.(svg|png|jpg|jpeg|gif|webp|ico|bmp|json)$/i"
         }
       ],
       "editor/context": [
@@ -53,6 +147,11 @@
           "command": "SVGViewer.open",
           "when": "explorerResourceIsFolder || resourceFilename =~ /.+\\.(svg|png|jpg|jpeg|gif|webp|ico|bmp|json)$/i",
           "group": "SVGViewer@1"
+        },
+        {
+          "command": "SVGViewer.openInPanel",
+          "when": "explorerResourceIsFolder || resourceFilename =~ /.+\\.(svg|png|jpg|jpeg|gif|webp|ico|bmp|json)$/i",
+          "group": "SVGViewer@2"
         }
       ]
     }
