@@ -1,7 +1,7 @@
 {
   "name": "svg-viewer",
-  "displayName": "SVG Viewer",
-  "description": "View SVG, images in a waterfall gallery",
+  "displayName": "%displayName%",
+  "description": "%description%",
   "version": "1.0.0",
   "icon": "logo.png",
   "publisher": "dev",
@@ -31,14 +31,14 @@
       "activitybar": [
         {
           "id": "svgViewerExplorer",
-          "title": "SVG Viewer",
+          "title": "%viewContainer.title%",
           "icon": "logo.svg"
         }
       ],
       "panel": [
         {
           "id": "svgViewerPanel",
-          "title": "SVG Viewer",
+          "title": "%viewContainer.title%",
           "icon": "logo.svg"
         }
       ]
@@ -47,16 +47,16 @@
       "svgViewerExplorer": [
         {
           "id": "svgViewer.imageTree",
-          "name": "Images",
-          "contextualTitle": "SVG Viewer"
+          "name": "%view.images.title%",
+          "contextualTitle": "%viewContainer.title%"
         }
       ],
       "svgViewerPanel": [
         {
           "type": "webview",
           "id": "svgViewer.panelView",
-          "name": "SVG Viewer",
-          "contextualTitle": "SVG Viewer"
+          "name": "%view.panel.title%",
+          "contextualTitle": "%viewContainer.title%"
         }
       ]
     },

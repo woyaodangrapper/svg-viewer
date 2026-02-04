@@ -19,7 +19,7 @@ export class ImageTreeItem extends vscode.TreeItem {
 
     if (nodeType === 'folder') {
       this.iconPath = new vscode.ThemeIcon('folder');
-      this.description = imageCount ? `${imageCount} images` : '';
+      this.description = imageCount ? `${imageCount} ${vscode.l10n.t('treeItem.imagesCount')}` : '';
     } else {
       const ext = path.extname(nodePath).toLowerCase();
       if (ext === '.svg') {
@@ -30,7 +30,7 @@ export class ImageTreeItem extends vscode.TreeItem {
       this.description = ext.slice(1).toUpperCase();
       this.command = {
         command: 'SVGViewer.openFromTree',
-        title: 'Open in SVG Viewer',
+        title: vscode.l10n.t('command.open.title'),
         arguments: [vscode.Uri.file(nodePath)]
       };
     }

@@ -49,7 +49,7 @@ export function activate(context: vscode.ExtensionContext) {
       } else if (vscode.workspace.workspaceFolders?.[0]) {
         targetPath = vscode.workspace.workspaceFolders[0].uri.fsPath;
       } else {
-        vscode.window.showErrorMessage('No file or folder selected');
+        vscode.window.showErrorMessage(vscode.l10n.t('error.noSelection'));
         return;
       }
     }
@@ -74,7 +74,7 @@ export function activate(context: vscode.ExtensionContext) {
     if (targetPath) {
       await openInViewer(targetPath, context);
     } else {
-      vscode.window.showErrorMessage('No file or folder selected');
+      vscode.window.showErrorMessage(vscode.l10n.t('error.noSelection'));
     }
   });
 
@@ -91,7 +91,7 @@ export function activate(context: vscode.ExtensionContext) {
       } else if (vscode.workspace.workspaceFolders?.[0]) {
         targetPath = vscode.workspace.workspaceFolders[0].uri.fsPath;
       } else {
-        vscode.window.showErrorMessage('No file or folder selected');
+        vscode.window.showErrorMessage(vscode.l10n.t('error.noSelection'));
         return;
       }
     }

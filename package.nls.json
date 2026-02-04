@@ -1,6 +1,13 @@
 {
+  "displayName": "SVG Viewer",
+  "description": "View SVG, images in a waterfall gallery",
+  "viewContainer.title": "SVG Viewer",
+  "view.images.title": "Images",
+  "view.panel.title": "SVG Viewer",
   "command.open.title": "Open in SVG Viewer",
   "command.openInPanel.title": "Open in SVG Viewer Panel",
   "command.refresh.title": "Refresh",
-  "command.open.category": "File"
+  "command.open.category": "File",
+  "error.noSelection": "No file or folder selected",
+  "treeItem.imagesCount": "images"
 }

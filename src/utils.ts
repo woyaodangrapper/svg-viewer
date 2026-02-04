@@ -65,6 +65,9 @@ export function getWebviewContent(
   }));
 
   const nonce = getNonce();
+  
+  // 获取 VS Code 语言环境
+  const locale = JSON.stringify(vscode.env.language);
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -79,6 +82,7 @@ export function getWebviewContent(
   <div id="root"></div>
   <script nonce="${nonce}">
     window.__IMAGES__ = ${JSON.stringify(imagesWithUri)};
+    window.__LOCALE__ = ${locale};
   </script>
   <script nonce="${nonce}" src="${scriptUri}"></script>
 </body>

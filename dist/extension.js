@@ -70,6 +70,7 @@ function getWebviewContent(webview, context, images) {
     uri: webview.asWebviewUri(vscode__namespace.Uri.file(img.path)).toString()
   }));
   const nonce = getNonce();
+  const locale = JSON.stringify(vscode__namespace.env.language);
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -83,6 +84,7 @@ function getWebviewContent(webview, context, images) {
   <div id="root"></div>
   <script nonce="${nonce}">
     window.__IMAGES__ = ${JSON.stringify(imagesWithUri)};
+    window.__LOCALE__ = ${locale};
   <\/script>
   <script nonce="${nonce}" src="${scriptUri}"><\/script>
 </body>
@@ -148,7 +150,7 @@ class ImageTreeItem extends vscode__namespace.TreeItem {
     this.tooltip = nodePath;
     if (nodeType === "folder") {
       this.iconPath = new vscode__namespace.ThemeIcon("folder");
-      this.description = imageCount ? `${imageCount} images` : "";
+      this.description = imageCount ? `${imageCount} ${vscode__namespace.l10n.t("treeItem.imagesCount")}` : "";
     } else {
       const ext = path__namespace.extname(nodePath).toLowerCase();
       if (ext === ".svg") {
@@ -159,7 +161,7 @@ class ImageTreeItem extends vscode__namespace.TreeItem {
       this.description = ext.slice(1).toUpperCase();
       this.command = {
         command: "SVGViewer.openFromTree",
-        title: "Open in SVG Viewer",
+        title: vscode__namespace.l10n.t("command.open.title"),
         arguments: [vscode__namespace.Uri.file(nodePath)]
       };
     }
@@ -363,7 +365,7 @@ function activate(context) {
       } else if ((_a = vscode__namespace.workspace.workspaceFolders) == null ? void 0 : _a[0]) {
         targetPath = vscode__namespace.workspace.workspaceFolders[0].uri.fsPath;
       } else {
-        vscode__namespace.window.showErrorMessage("No file or folder selected");
+        vscode__namespace.window.showErrorMessage(vscode__namespace.l10n.t("error.noSelection"));
         return;
       }
     }
@@ -381,7 +383,7 @@ function activate(context) {
     if (targetPath) {
       await openInViewer(targetPath, context);
     } else {
-      vscode__namespace.window.showErrorMessage("No file or folder selected");
+      vscode__namespace.window.showErrorMessage(vscode__namespace.l10n.t("error.noSelection"));
     }
   });
   const openInPanelDisposable = vscode__namespace.commands.registerCommand("SVGViewer.openInPanel", async (uri) => {
@@ -396,7 +398,7 @@ function activate(context) {
       } else if ((_a = vscode__namespace.workspace.workspaceFolders) == null ? void 0 : _a[0]) {
         targetPath = vscode__namespace.workspace.workspaceFolders[0].uri.fsPath;
       } else {
-        vscode__namespace.window.showErrorMessage("No file or folder selected");
+        vscode__namespace.window.showErrorMessage(vscode__namespace.l10n.t("error.noSelection"));
         return;
       }
     }

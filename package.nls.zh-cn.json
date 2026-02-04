@@ -1,6 +1,13 @@
 {
+  "displayName": "SVG 查看器",
+  "description": "以瀑布流画廊方式查看 SVG 和图片",
+  "viewContainer.title": "SVG 查看器",
+  "view.images.title": "图片",
+  "view.panel.title": "SVG 查看器",
   "command.open.title": "在 SVG 查看器中打开",
   "command.openInPanel.title": "在底部面板打开 SVG 查看器",
   "command.refresh.title": "刷新",
-  "command.open.category": "文件"
+  "command.open.category": "文件",
+  "error.noSelection": "未选择文件或文件夹",
+  "treeItem.imagesCount": "张图片"
 }

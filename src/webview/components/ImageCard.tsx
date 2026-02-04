@@ -29,6 +29,8 @@ interface ImageCardProps {
 }
 
 import { openSvgInEditor, goToSvgInLocate } from '../Api';
+import { t } from '../i18n';
+
 const ImageCard: React.FC<ImageCardProps> = ({ image }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -89,10 +91,10 @@ const ImageCard: React.FC<ImageCardProps> = ({ image }) => {
                   </div>
                   <Dropdown.Menu>
                     <Dropdown.Item id="edit" textValue="Edit" onClick={openSvgInEditor(image.path)}>
-                      <Label>编辑</Label>
+                      <Label>{t('action.edit')}</Label>
                     </Dropdown.Item>
                     <Dropdown.Item id="locate" textValue="Locate" onClick={goToSvgInLocate(image.path)}>
-                      <Label>定位</Label>
+                      <Label>{t('action.locate')}</Label>
                     </Dropdown.Item>
                     {/* <Dropdown.Item id="profile" textValue="Profile">
                         <Label>Profile</Label>
