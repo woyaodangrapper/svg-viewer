@@ -71,6 +71,10 @@ export function activate(context: vscode.ExtensionContext) {
         if (message.command === 'open-web') {
           vscode.env.openExternal(vscode.Uri.parse(message.url));
         }
+        if (message.command === 'go-to-svg') {
+          const svgUri = vscode.Uri.file(message.path);
+          openSvgInLocate(svgUri);
+        }
       },
       undefined,
       context.subscriptions
@@ -81,7 +85,13 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(disposable);
 }
+function openSvgInLocate(svgUri: vscode.Uri) {
+  const uri = vscode.Uri.file(svgUri.fsPath);
 
+  vscode.commands.executeCommand('revealInExplorer', uri).then(undefined, err => {
+    vscode.window.showErrorMessage(`无法定位 SVG: ${err}`);
+  });
+}
 function openSvgInEditor(svgUri: vscode.Uri) {
   vscode.workspace.openTextDocument(svgUri).then(doc => {
     vscode.window.showTextDocument(doc, {

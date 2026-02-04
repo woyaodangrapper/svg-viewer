@@ -70,7 +70,8 @@ const App: React.FC<AppProps> = ({ images }) => {
                 />
               </svg>
             </SearchField.SearchIcon>
-            <SearchField.Input className="w-70" placeholder="搜索图片..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+
+            <SearchField.Input className="w-70" placeholder={selectedTab !== 'online' ? "搜索图片..." : "搜索图库..."} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
             <SearchField.ClearButton />
           </SearchField.Group>
         </SearchField>
@@ -78,7 +79,7 @@ const App: React.FC<AppProps> = ({ images }) => {
 
         <Tabs className="w-full" orientation="vertical" selectedKey={selectedTab} onSelectionChange={(key) => setSelectedTab(key as string)}>
           <Tabs.ListContainer>
-            <Tabs.List aria-label="图片分类" className='min-w-[120px]'>
+            <Tabs.List aria-label="图片分类" className='min-w-30'>
               <Tabs.Tab id="all">
                 <div className="flex items-center gap-2">全部 <Chip>{categories.all.length}</Chip></div>
                 <Tabs.Indicator />
@@ -102,7 +103,7 @@ const App: React.FC<AppProps> = ({ images }) => {
           </Tabs.ListContainer>
           {/* 每个 Panel 内部显示对应分类图片列表 */}
           <Tabs.Panel id="all">
-            {categories.all.length === 0 ? (
+            {filteredImages.length === 0 ? (
               <Card className="bg-(--vscode-editor-background) border border-(--vscode-panel-border)">
                 <CardContent className="text-center py-12">
                   <p className="text-lg text-gray-400">没有找到图片</p>
@@ -110,27 +111,27 @@ const App: React.FC<AppProps> = ({ images }) => {
               </Card>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-                {categories.all.map(renderImageCard)}
+                {filteredImages.map(renderImageCard)}
               </div>
             )}
           </Tabs.Panel>
 
           <Tabs.Panel id="svg">
-            {categories.svg.length === 0 ? (
+            {filteredImages.filter(image => image.type === 'svg').length === 0 ? (
               <p className="text-gray-400 text-center py-12">没有找到 SVG</p>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-                {categories.svg.map(renderImageCard)}
+                {filteredImages.filter(image => image.type === 'svg').map(renderImageCard)}
               </div>
             )}
           </Tabs.Panel>
 
           <Tabs.Panel id="image">
-            {categories.image.length === 0 ? (
+            {filteredImages.filter(image => image.type === 'image').length === 0 ? (
               <p className="text-gray-400 text-center py-12">没有找到图片</p>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-                {categories.image.map(renderImageCard)}
+                {filteredImages.filter(image => image.type === 'image').map(renderImageCard)}
               </div>
             )}
           </Tabs.Panel>

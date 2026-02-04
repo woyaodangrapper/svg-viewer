@@ -28,20 +28,7 @@ interface ImageCardProps {
   image: ImageFile;
 }
 
-interface vsCodeApi {
-  postMessage(message: any): void;
-}
-
-declare function acquireVsCodeApi<T = any>(): {
-  postMessage(message: T): void;
-};
-
-
-const openSvgInEditor = (path: string) => () => {
-  const vscode: vsCodeApi = acquireVsCodeApi();
-  vscode.postMessage({ command: 'open-svg', path });
-}
-
+import { openSvgInEditor, goToSvgInLocate } from '../Api';
 const ImageCard: React.FC<ImageCardProps> = ({ image }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -98,6 +85,9 @@ const ImageCard: React.FC<ImageCardProps> = ({ image }) => {
                     <Dropdown.Menu>
                       <Dropdown.Item id="edit" textValue="Edit" onClick={openSvgInEditor(image.path)}>
                         <Label>编辑</Label>
+                      </Dropdown.Item>
+                      <Dropdown.Item id="locate" textValue="Locate" onClick={goToSvgInLocate(image.path)}>
+                        <Label>定位</Label>
                       </Dropdown.Item>
                       {/* <Dropdown.Item id="profile" textValue="Profile">
                         <Label>Profile</Label>

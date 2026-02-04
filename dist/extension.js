@@ -75,6 +75,10 @@ function activate(context) {
         if (message.command === "open-web") {
           vscode__namespace.env.openExternal(vscode__namespace.Uri.parse(message.url));
         }
+        if (message.command === "go-to-svg") {
+          const svgUri = vscode__namespace.Uri.file(message.path);
+          openSvgInLocate(svgUri);
+        }
       },
       void 0,
       context.subscriptions
@@ -82,6 +86,12 @@ function activate(context) {
     panel.webview.html = getWebviewContent(panel.webview, context, images);
   });
   context.subscriptions.push(disposable);
+}
+function openSvgInLocate(svgUri) {
+  const uri = vscode__namespace.Uri.file(svgUri.fsPath);
+  vscode__namespace.commands.executeCommand("revealInExplorer", uri).then(void 0, (err) => {
+    vscode__namespace.window.showErrorMessage(`无法定位 SVG: ${err}`);
+  });
 }
 function openSvgInEditor(svgUri) {
   vscode__namespace.workspace.openTextDocument(svgUri).then((doc) => {

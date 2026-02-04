@@ -104,21 +104,11 @@ const iconLibraries: IconLibraryItem[] = [
   }
 ];
 
-interface vsCodeApi {
-  postMessage(message: any): void;
-}
-declare function acquireVsCodeApi<T = any>(): {
-  postMessage(message: T): void;
-};
 
 interface IconLibraryProps {
   library?: string;
 }
-
-const openSvgInWeb = (url: string) => {
-  const vscode: vsCodeApi = acquireVsCodeApi();
-  vscode.postMessage({ command: 'open-web', url });
-}
+import { openSvgInWeb } from '../Api';
 
 export const IconLibrary: React.FC<IconLibraryProps> = ({ library = '' }) => {
   const filteredLibraries = iconLibraries.filter(lib =>
